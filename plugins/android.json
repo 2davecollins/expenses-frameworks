@@ -1,0 +1,21 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-camera": {
+      "PACKAGE_NAME": "com.davec.expenses"
+    },
+    "cordova-plugin-ml-kit": {
+      "PACKAGE_NAME": "com.davec.expenses"
+    },
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.davec.expenses"
+    }
+  },
+  "dependent_plugins": {}
+}

@@ -1,0 +1,55 @@
+{
+  "_from": "cordova-plugin-ml-kit",
+  "_id": "cordova-plugin-ml-kit@2.0.1",
+  "_inBundle": false,
+  "_integrity": "sha512-x2Bt5y7CuTD9h6tlP419qTjjcNS9vUU4VotNmhNRhyT73k5Enov2yx6BQqP81ckc/vP+ZzfupHXtbvO7STM/Yg==",
+  "_location": "/cordova-plugin-ml-kit",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-ml-kit",
+    "name": "cordova-plugin-ml-kit",
+    "escapedName": "cordova-plugin-ml-kit",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-ml-kit/-/cordova-plugin-ml-kit-2.0.1.tgz",
+  "_shasum": "77b29b2d96b151c2106336dbc3f82f51dee3dbcf",
+  "_spec": "cordova-plugin-ml-kit",
+  "_where": "C:\\Users\\2dave\\cordovaProjects\\cordova-expenses",
+  "bugs": {
+    "url": "https://github.com/paulstelzer/cordova-plugin-ml-kit/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-ml-kit",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "deprecated": false,
+  "description": "Adds ML Kit support for Firebase",
+  "homepage": "https://github.com/paulstelzer/cordova-plugin-ml-kit",
+  "keywords": [
+    "firebase",
+    "ml-kit",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "name": "cordova-plugin-ml-kit",
+  "peerDependencies": {
+    "cordova-plugin-firebase": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulstelzer/cordova-plugin-ml-kit.git"
+  },
+  "version": "2.0.1"
+}

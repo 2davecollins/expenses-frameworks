@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+
+        <link rel="stylesheet" type="text/css" href="js/jqmobile/jquery.mobile-1.4.5.css" />
+        <script src="js/external/jquery-1.11.1.min.js"></script>
+        <script src="js/external/jquery-ui.js"></script>
+        <script src="js/jqmobile/jquery.mobile-1.4.5.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <title>Expense App</title>
+    </head>
+    <body>
+        
+        <div data-role="page" data-theme="b" id="page1">
+            <div data-role="header" data-position="fixed">
+                <h1>Expenses</h1>                
+            </div><!-- /header -->        
+        
+            <div role="main" class="ui-content">
+                
+                <div data-role="collapsible-set" id="inputset">    
+                    <div data-role="collapsible" data-collapsed="true" data-theme="b" data-content-theme="a">
+                            <h4 >Add Expense</h4>
+                            <p>Shop :<input data-bind="textInput: shopid" /></p>
+                            <p>Desc :<input data-bind="textInput: descip" /></p>
+                            <div class="ui-grid-a">
+                                <div class="ui-block-a"> <p>When :<input type="text" data-bind="textInput: whenPurchasedip"  /></p></div>
+                                <div class="ui-block-b"><p>Total :<input data-bind="textInput: totalip" /></p></div>
+                            </div>                              
+                            <hr/>
+                            <a href="#" data-bind="click: addExpense">Add</a>
+                    </div>
+                </div>
+                
+                <div data-role="collapsible-set" id="expenseset">
+                       
+                    <div data-bind="foreach: expenses">
+                        <div data-role="collapsible" data-collapsed="true" data-theme="b" data-content-theme="a">
+                            <h4 data-bind="text: shop "></h4>
+                            <p><span data-bind="text: desc "></span></p>
+                            <div class="ui-grid-a">
+                                <div class="ui-block-a"> <p><span data-bind="text: whenPurchased"></span></p></div>
+                                <div class="ui-block-b"><p><span data-bind="text: total"></span></p></div>
+                            </div>                       
+                            <a href="#" data-bind="click: $parent.removeExpense">Remove</a>
+                            <hr/>
+                        </div>
+                    </div>
+                </div>              
+
+            </div><!-- /content -->
+        
+            <div data-role="footer" data-position="fixed">
+                <h4>Home</h4>
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#page1">Home</a></li>
+                        <li><a href="#page2">Camera</a></li>
+                        <li><a href="#page3">Result</a></li>
+                    </ul>
+                </div>                
+            </div><!-- /footer -->
+        </div><!-- /page -->
+        <div data-role="page" data-theme="b" id="page2">
+
+            <div data-role="header" data-position="fixed">
+                <h1>Camera</h1>
+            </div><!-- /header -->
+        
+            <div role="main" class="ui-content">
+                <p>Name :<span data-bind="text: personName"></span></p>
+                <button class="btn btn-info" data-bind="click: takePicture">Snap</button>
+                <button class="btn btn-info" data-bind="click: readPicture">Read</button>
+                <div class="center-div">
+                    <img data-bind="attr:{src: imagePath}" alt="Smiley face">
+                </div>
+
+                <p><span data-bind="text: errorMsg"></span></p>
+               
+            </div><!-- /content -->
+        
+            <div data-role="footer" data-position="fixed">
+                <h4>Camera</h4>
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#page1">Home</a></li>
+                        <li><a href="#page2">Camera</a></li>
+                        <li><a href="#page3">Result</a></li>
+                    </ul>
+                </div> 
+            </div><!-- /footer -->
+        </div><!-- /page -->
+        <div data-role="page"  data-theme="b" id="page3">
+
+            <div data-role="header" data-position="fixed">
+                <h1>Results</h1>
+            </div><!-- /header -->
+        
+            <div role="main" class="ui-content">
+                <p>Name :<span data-bind="text: personName"></span></p>
+                <div>
+                <p data-bind="text: imagePath"></p>
+                <!-- <p data-bind="text: resultMsg"></p> -->
+                </div>
+                <h2>Result from Decoding Text</h2>
+                <ul data-bind="foreach: resultArr">
+                    <li>
+                        <p><span data-bind="text: $data.text"></span> : <span data-bind="text: $data.boundingBox.bottom"></span></p>
+                    </li>
+                </ul>                
+                   
+            </div><!-- /content -->
+        
+            <div data-role="footer" data-position="fixed">
+                <h4>Text</h4>
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#page1">Home</a></li>
+                        <li><a href="#page2">Camera</a></li>
+                        <li><a href="#page3">Result</a></li>
+                    </ul>
+                </div> 
+            </div><!-- /footer -->
+        </div><!-- /page -->
+        
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/external/knockout-min.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+    </body>
+</html>

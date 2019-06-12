@@ -1,3 +1,29 @@
+class Expense {
+
+    constructor(obj) {
+        this._id = generateUUID();
+        this.shop = obj.shop;
+        this.desc = obj.desc;
+        this.whenPurchased = obj.whenPurchased;
+        this.total = obj.total;
+        this.uploaded = false;
+    }
+    get expenseId() {
+        return this._id;
+    }
+    get expenseUpLoaded (){
+        return this.uploaded;
+    }  
+           
+}
+
+class MyArray extends Array {
+    sortBy(...args) {
+        return this.sort(dynamicSortMultiple.apply(null, args));
+    }
+}
+var db;
+var remoteCouch;
 
 var app = {
     // Application Constructor
@@ -8,10 +34,18 @@ var app = {
     
     onDeviceReady: function() {
        // this.receivedEvent('deviceready');
-       console.log("Device is Ready ....")
-        
+       console.log("Device is Ready ....")        
        ko.applyBindings(myViewModel);
+
+       db = new PouchDB('expenses');
+       remoteCouch = false;    
        setUpExpense ()
+       showAllExpenses()
+       $("#expenseip").click(function() {
+           console.log("date clicked")
+           $('#db1', window.parent.document).get(0).scrollIntoView();
+        
+       });
 
     //    $.datepicker.setDefaults({
     //     showOn: "both",
@@ -46,11 +80,7 @@ var myViewModel = {
     readPicture : function(){
         readPhotograph()
     },
-    removeExpense : function(el){
-        console.log(el);
-        removeSomeExpense(el)       
-       
-    },
+   
     resetExpenseIP : function(){
         const x = this.idip()
         this.idip(x),
@@ -62,8 +92,93 @@ var myViewModel = {
     
     addExpense : function(){         
         addNewExpense ();    
+    },
+    editExpense : function(el){
+        //console.log(el)
+       // editDisplay(el);
+       findInDB("Tesco");
+       
+    },
+    removeExpense : function(el){
+        console.log(el);
+       
+        deleteExpense(el)
+        showAllExpenses()
+    },
+    showExpenses : function(){
+        showAllExpenses();
     }
 };
+
+//pouchdb
+function showAllExpenses() {
+    myViewModel.expenses([]);
+    db.allDocs({
+        include_docs: true,
+        attachments: true
+      }).then(function (result) {
+        // handle result
+        let res = result.rows;        
+        res.forEach(function (item){
+            myViewModel.expenses.push(item.doc);
+        })
+        
+      }).then(function(){
+        console.log("Refreshing List");
+        refreshList()
+      }).catch(function (err) {
+        console.log(err);
+      });
+}
+
+function addExpenceDB(expenceobj) {
+    
+    db.put(expenceobj, function callback(err, result) {
+      if (!err) {
+        console.log('Successfully posted a expense!');
+      }
+    });
+}
+
+function deleteExpense(expense) {
+    db.remove(expense);
+}
+
+function updateExpense(expense){
+    db.get('expense').then(function(doc) {
+        return db.put({
+          _id: 'expense',
+          _rev: doc._rev,
+          title: "Let's Dance"
+        });
+      }).then(function(response) {
+        // handle response
+      }).catch(function (err) {
+        console.log(err);
+      });
+}
+
+function findInDB (datatofind){
+
+    db.find({
+        selector: {shop: {$eq: datatofind}}
+      }).then(function (result) {
+        // handle result
+        console.log(result)
+      }).catch(function (err) {
+        console.log(err);
+      });
+}
+
+function deteteDB (){
+
+    db.destroy().then(function (response) {
+        // success
+        console.log(response)
+      }).catch(function (err) {
+        console.log(err);
+      });
+}
 
 function takePhotograph(){
 
@@ -103,10 +218,7 @@ function readPhotograph(){
     const img = myViewModel.imagePath();
     let tempLine = [];
     let tempElement = []
-    
-
-    //navigator.getText(img, options, success, error)
-
+ 
     MlKitPlugin.getText(img,{},function onSuccess(data) {
         // var image = document.getElementById('myImage');        
          console.log(data)
@@ -122,34 +234,91 @@ function readPhotograph(){
          console.log("--------------------")
          myViewModel.resultMsg(data.text);
 
-         myViewModel.resultArr(tempLine)
+         //myViewModel.resultArr(tempLine)
+         sortArray(tempLine);
 
 
      },
      
      function onFail(err) {
          console.log(err)
-     });
-
-    
+     });    
 }
+
+function sortArray(myA){
+    //let myA = []
+   // myA =  myViewModel.resultArr()
+
+    //console.log(myA);
+    //myA.sort(dynamicSort("boundingBox.bottom"));
+    myA.sort(dynamicSort("text"));
+  // MyArray.from(myA).sortBy("text");
+   console.log(myA)
+   myViewModel.resultArr(myA)
+
+
+}
+function dynamicSortMultiple() {
+    /*
+     * save the arguments object as it will be overwritten
+     * note that arguments object is an array-like object
+     * consisting of the names of the properties to sort by
+     */
+    var props = arguments;
+    return function (obj1, obj2) {
+        var i = 0, result = 0, numberOfProperties = props.length;
+        /* try getting a different result from 0 (equal)
+         * as long as we have extra properties to compare
+         */
+        while(result === 0 && i < numberOfProperties) {
+            result = dynamicSort(props[i])(obj1, obj2);
+            i++;
+        }
+        return result;
+    }
+}
+function dynamicSort(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        /* next line works with strings and numbers, 
+         * and you may want to customize it to your needs
+         */
+        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
+
 function setUpExpense (){
-    myViewModel.expenses.push({
-        id:0,
-        shop:"Dunnes",
-        whenPurchased:"10-06-2019",
-        desc:"food",
-        total: 2.99
-    });
-    myViewModel.expenses.push({
-        id:1,
-        shop:"Aldi",
-        whenPurchased:"10-06-2019",
-        desc:"Bread",
-        total: 1.99
-    });
-    $( "#expenseset" ).collapsibleset( "refresh" );
+    myViewModel.expenses([]);
+    // myViewModel.expenses.push({
+    //     id:0,
+    //     shop:"Dunnes",
+    //     whenPurchased:"10-06-2019",
+    //     desc:"food",
+    //     total: 2.99
+    // });
+    // myViewModel.expenses.push({
+    //     id:1,
+    //     shop:"Aldi",
+    //     whenPurchased:"10-06-2019",
+    //     desc:"Bread",
+    //     total: 1.99
+    // });
+    // $( "#expenseset" ).collapsibleset( "refresh" );
     
+
+};
+function editDisplay(expense){
+    
+    myViewModel.shopid(expense.shop),
+    myViewModel.descip(expense.desc),
+    myViewModel.whenPurchasedip(expense.whenPurchased),
+    myViewModel.totalip(expense.total)
+
 
 };
 
@@ -164,17 +333,30 @@ function addNewExpense (){
         whenPurchased:myViewModel.whenPurchasedip(),
         total:myViewModel.totalip()
     }
+
+    //let exp1 = new Expense(exp);
+    addExpenceDB(new Expense(exp))   
+    console.log("lllllllllll    llllllll");
+
+    myViewModel.resetExpenseIP();
     myViewModel.expenses.push(exp)     
-    $( "#expenseset" ).collapsibleset( "refresh" );
-    $( "#inputset" ).collapsibleset( "refresh" );
+    // $( "#expenseset" ).collapsibleset( "refresh" );
+    // $( "#inputset" ).collapsibleset( "refresh" );
+    refreshList();
 
-    setTimeout(function(){
-        myViewModel.resetExpenseIP();
-        $( "#inputset" ).collapsibleset( "refresh" );
-
-    },1000);
+   
    
 };
+function refreshList (){
+    setTimeout(function(){
+       
+               
+        //$( "#inputset" ).children().collapsible("collapse");
+      //  $( "#expenseset" ).children().collapsible("collapse");
+        $( "#expenseset" ).collapsibleset( "refresh" );
+
+    },5);
+}
 
 function removeSomeExpense(el){
     console.log(el)
@@ -193,38 +375,17 @@ function removeSomeExpense(el){
     myViewModel.expenses(newArr);
 }
 
-class Expense {
-    constructor(obj) {
-        this.id = obj.id;
-        this.shop = obj.shop;
-        this.desc = obj.desc;
-        this.whenPurchased = obj.whenPurchased;
-        this.total = obj.total;
+function generateUUID() { // Public Domain/MIT
+    var d = new Date().getTime();
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+        d += performance.now(); //use high-precision timer if available
     }
-    get expenseDiv() {
-        return this.generateExpense();
-    }
-    generateExpense() {
-        const price = average(this.total).toFixed(2);
-        const markup = `       
-        
-            <div class="card-panel teal">
-                <h6 class="card-title white-text">${this.city}</h6>
-                <p class="white-text"><span>${this.day}</span><span class="floatright">wind ${ws}m/s</span></p>               
-                <div class="row">                   
-                    <div class="col s2"><img src="http://openweathermap.org/img/w/${this.icons[0]}.png" alt="Smiley face"></div>
-                    <div class="col s2"><img src="http://openweathermap.org/img/w/${this.icons[1]}.png" alt="Smiley face"></div>
-                    <div class="col s2"><img src="http://openweathermap.org/img/w/${this.icons[2]}.png" alt="Smiley face"></div>
-                    <div class="col s2"><img src="http://openweathermap.org/img/w/${this.icons[3]}.png" alt="Smiley face"></div>
-                    <div class="col s2"><img src="http://openweathermap.org/img/w/${this.icons[4]}.png" alt="Smiley face"></div>                   
-                 </div>              
-                <div id=${this.chartdiv} style="height: 200px; width: 100%;"></div>                 
-            </div>       
-        `;
-        const card = document.createElement("div");
-        card.className = "col s12 m6";
-        card.innerHTML = markup;
-        return card;
-    }
-}  
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
+
 

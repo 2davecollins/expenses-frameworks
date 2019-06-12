@@ -20,6 +20,7 @@
         <script src="js/external/jquery-1.11.1.min.js"></script>
         <script src="js/external/jquery-ui.js"></script>
         <script src="js/jqmobile/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jqmobile/jtsage-datebox.min.js"></script>
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <title>Expense App</title>
     </head>
@@ -31,18 +32,25 @@
             </div><!-- /header -->        
         
             <div role="main" class="ui-content">
+                <button class="ui-btn" data-bind="click: showExpenses">Show</button>
                 
                 <div data-role="collapsible-set" id="inputset">    
-                    <div data-role="collapsible" data-collapsed="true" data-theme="b" data-content-theme="a">
+                    <div id="expenseip"data-role="collapsible" data-collapsed="true" data-theme="b" data-content-theme="a">
                             <h4 >Add Expense</h4>
                             <p>Shop :<input data-bind="textInput: shopid" /></p>
                             <p>Desc :<input data-bind="textInput: descip" /></p>
                             <div class="ui-grid-a">
-                                <div class="ui-block-a"> <p>When :<input type="text" data-bind="textInput: whenPurchasedip"  /></p></div>
-                                <div class="ui-block-b"><p>Total :<input data-bind="textInput: totalip" /></p></div>
-                            </div>                              
+                                <div class="ui-block-a date"> <p>When :
+                                     <input class="form-control" type="text"  data-bind="textInput: whenPurchasedip" data-role="datebox"  data-datebox-mode="calbox" id="db1" readonly>
+                                </p></div>
+                                <div class="ui-block-b"><p>Total :
+                                    <input type="number" data-bind="textInput: totalip" />
+                                </p></div>
+                            
+                            </div>
+                           
                             <hr/>
-                            <a href="#" data-bind="click: addExpense">Add</a>
+                            <button data-bind="click: addExpense">Add</button>
                     </div>
                 </div>
                 
@@ -56,7 +64,8 @@
                                 <div class="ui-block-a"> <p><span data-bind="text: whenPurchased"></span></p></div>
                                 <div class="ui-block-b"><p><span data-bind="text: total"></span></p></div>
                             </div>                       
-                            <a href="#" data-bind="click: $parent.removeExpense">Remove</a>
+                            <button data-bind="click: $parent.removeExpense">Remove</button>
+                            <button data-bind="click: $parent.editExpense">Edit</button>
                             <hr/>
                         </div>
                     </div>
@@ -119,7 +128,13 @@
                 <h2>Result from Decoding Text</h2>
                 <ul data-bind="foreach: resultArr">
                     <li>
-                        <p><span data-bind="text: $data.text"></span> : <span data-bind="text: $data.boundingBox.bottom"></span></p>
+                        <p><span data-bind="text: $data.text">
+                        </span> : <span data-bind="text: $data.boundingBox.top"></span>
+                        </span> : <span data-bind="text: $data.boundingBox.bottom"></span>
+                        </span> : <span data-bind="text: $data.boundingBox.left"></span>
+                        </span> : <span data-bind="text: $data.boundingBox.right"></span>
+                    
+                    </p>
                     </li>
                 </ul>                
                    
@@ -139,6 +154,8 @@
         
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/external/knockout-min.js"></script>
+        <script type="text/javascript" src="js/external/pouchdb-7.0.0.min.js"></script>
+        <script type="text/javascript" src="js/external/pouchdb.find.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
     </body>
 </html>

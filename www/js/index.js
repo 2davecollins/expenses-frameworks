@@ -47,6 +47,8 @@ var app = {
         
        });
 
+       cameraCleanup();
+
     //    $.datepicker.setDefaults({
     //     showOn: "both",
     //     buttonImageOnly: true,
@@ -73,9 +75,20 @@ var myViewModel = {
     resultMsg: ko.observable(''),
     resultArr: ko.observableArray([]),
     expenses: ko.observableArray([]),
+
+    editShop: ko.observable(''),
+    editDesc: ko.observableArray([]),
+    editTotal: ko.observable(''),
+    editDate : ko.observable(''),
+    editExpenses: ko.observableArray([]),
+
+
     takePicture : function() {       
-        this.personName('David');
+       
         takePhotograph();
+    },
+    retrievePicture : function(){
+        retrievePhotograph();
     },
     readPicture : function(){
         readPhotograph()
@@ -192,22 +205,78 @@ function takePhotograph(){
        // var image = document.getElementById('myImage');
         myViewModel.imagePath(imageURI);
         console.log(imageURI)
+        
     }
     
     function onFail(message) {
-        alert('Failed because: ' + message);
+        myViewModel.errorMsg('Failed because: ' + message);
     }
 }
+
+function retrievePhotograph(){
+    const srcType = Camera.PictureSourceType.PHOTOLIBRARY;
+    const options = setOptions(srcType);
+
+    navigator.camera.getPicture(onSuccess, onFail, options);
+    
+    function onSuccess(imageURI) {
+       // var image = document.getElementById('myImage');
+        myViewModel.imagePath(imageURI);
+        console.log(imageURI)
+        
+    }
+    
+    function onFail(message) {
+        myViewModel.errorMsg('Failed because: ' + message);
+    }
+
+}
+
+function cameraCleanup(){
+    navigator.camera.cleanup(
+        onSuccess,
+        onFail
+    )
+    function onSuccess(data){
+        console.log("Cleanup Success");
+    }
+    function onFail(err){
+        console.log("Cleanup fail");
+        console.log(err);
+    }
+
+}
 function setOptions(srcType) {
+    // srcTypes
+    // Camera.PictureSourceType.CAMERA;
+    // Camera.PictureSourceType.PHOTOLIBRARY
+    // Camera.PictureSourceType.SAVEDPHOTOALBUM
+
+    // destinationType
+    // DATA_URL 0   base64 encoded string
+    // FILE_URL 1   file uri
+    // NATIVE_URI 2 native uri
+
+    // encodingType
+    // JPEG
+    // PNG
+
+    // mediaType
+    // PICTURE  0  still pictures
+    // VIDEO    1  video only
+    // ALLMEDIA 2  selection
+
+    // saveToPhotoAlbum boolean 
+    // cameraDirection 0 BACK || 1 FRONT 
     var options = {
         // Some common settings are 20, 50, and 100
-        quality: 50,
+        quality: 100,
         destinationType: Camera.DestinationType.FILE_URI,
         // In this app, dynamically set the picture source, Camera or photo gallery
         sourceType: srcType,
         encodingType: Camera.EncodingType.JPEG,
         mediaType: Camera.MediaType.PICTURE,
-        allowEdit: true,
+        allowEdit: false,
         correctOrientation: true  //Corrects Android orientation quirks
     }
     return options;
@@ -220,22 +289,37 @@ function readPhotograph(){
     let tempElement = []
  
     MlKitPlugin.getText(img,{},function onSuccess(data) {
-        // var image = document.getElementById('myImage');        
-         console.log(data)
+           
+         
 
          for (var block of data.textBlocks){
              for (var line of block.lines){
                  tempLine.push(line)                
              }
          }
-
-         console.log("--------------------")
-         console.log(tempLine)
-         console.log("--------------------")
-         myViewModel.resultMsg(data.text);
-
          //myViewModel.resultArr(tempLine)
-         sortArray(tempLine);
+
+        
+        // myViewModel.resultMsg(data.textBlocks);        
+        //tempLine = sortArray(data.textBlocks);
+        tempLine = sortArray(tempLine);
+        //tempLine = findLargest(tempLine)
+        myViewModel.editShop(tempLine[0].text)
+        console.log(tempLine)
+        addToLineArray(tempLine)     
+        
+        myViewModel.resultArr(tempLine)
+
+        // let descArr = myViewModel.editExpenses();
+        // let desc = descArr.join();
+
+
+        // // let desc = myViewModel.editExpenses().map(function(o){
+        // //     return o['text'];
+        // // })
+
+        // // console.log(desc)
+        // myViewModel.editDesc(desc)
 
 
      },
@@ -246,17 +330,50 @@ function readPhotograph(){
 }
 
 function sortArray(myA){
-    //let myA = []
-   // myA =  myViewModel.resultArr()
 
-    //console.log(myA);
-    //myA.sort(dynamicSort("boundingBox.bottom"));
-    myA.sort(dynamicSort("text"));
-  // MyArray.from(myA).sortBy("text");
-   console.log(myA)
-   myViewModel.resultArr(myA)
+    myA.map(o => { o.tb = Math.round((o.boundingBox.top + o.boundingBox.bottom)/200); return o}); 
+    //myA.map(o => { o.s = Math.round((o.boundingBox.bottom - o.boundingBox.top)); return o});
+    myA.map(o => { o.lr = o.boundingBox.left; return o});
 
+    myA.sort(dynamicSort("tb")); 
+    return myA;
+}
 
+function addToLineArray(myA){
+    let ar1=[]
+    let size = myA.length;
+
+    myA.map(function (value,index, element){
+        if(index < size-1){
+            var next = element[index+1]
+            if(next.tb == element[index].tb){
+                ar1.push(element[index].text + " :"+next.text)
+            }
+        }
+    })
+   //myViewModel.editExpenses(myA)
+   
+    console.log(ar1)
+
+    // ar1.map(function(o){
+    //     return o['text']
+    // })
+
+    myViewModel.editDesc(ar1.join("\n"));  
+    
+    
+}
+function findLargest(myA){
+
+    // not so simple largest textBlock not the largest lettering could cover multiple lines
+
+    const res = Math.max.apply(Math, myA.map(function (o) {
+        return o.s;
+    }))
+    const obj = myA.find(function(o){
+        return o.s == res;
+    })
+    return obj;
 }
 function dynamicSortMultiple() {
     /*

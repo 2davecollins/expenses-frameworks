@@ -92,7 +92,17 @@
         
             <div role="main" class="ui-content">
                 <p>Name :<span data-bind="text: personName"></span></p>
-                <button class="btn btn-info" data-bind="click: takePicture">Snap</button>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <button class="btn btn-info" data-bind="click: takePicture">Camara</button>
+
+                    </div>
+                    <div class="ui-block-b">
+                        <button class="btn btn-info" data-bind="click: retrievePicture">Gallery</button>
+
+                    </div>
+                </div>
+                
                 <button class="btn btn-info" data-bind="click: readPicture">Read</button>
                 <div class="center-div">
                     <img data-bind="attr:{src: imagePath}" alt="Smiley face">
@@ -113,45 +123,90 @@
                 </div> 
             </div><!-- /footer -->
         </div><!-- /page -->
+        
         <div data-role="page"  data-theme="b" id="page3">
 
-            <div data-role="header" data-position="fixed">
-                <h1>Results</h1>
-            </div><!-- /header -->
-        
-            <div role="main" class="ui-content">
-                <p>Name :<span data-bind="text: personName"></span></p>
-                <div>
-                <p data-bind="text: imagePath"></p>
-                <!-- <p data-bind="text: resultMsg"></p> -->
-                </div>
-                <h2>Result from Decoding Text</h2>
-                <ul data-bind="foreach: resultArr">
-                    <li>
-                        <p><span data-bind="text: $data.text">
-                        </span> : <span data-bind="text: $data.boundingBox.top"></span>
-                        </span> : <span data-bind="text: $data.boundingBox.bottom"></span>
-                        </span> : <span data-bind="text: $data.boundingBox.left"></span>
-                        </span> : <span data-bind="text: $data.boundingBox.right"></span>
-                    
-                    </p>
-                    </li>
-                </ul>                
-                   
-            </div><!-- /content -->
-        
-            <div data-role="footer" data-position="fixed">
-                <h4>Text</h4>
-                <div data-role="navbar">
-                    <ul>
-                        <li><a href="#page1">Home</a></li>
-                        <li><a href="#page2">Camera</a></li>
-                        <li><a href="#page3">Result</a></li>
-                    </ul>
-                </div> 
-            </div><!-- /footer -->
-        </div><!-- /page -->
-        
+                <div data-role="header" data-position="fixed">
+                    <h1>Results</h1>
+                </div><!-- /header -->
+            
+                <div role="main" class="ui-content">
+                    <p>Name :<span data-bind="text: personName"></span></p>
+                    <div>
+                    <p data-bind="text: imagePath"></p>
+                    <!-- <p data-bind="text: resultMsg"></p> -->
+                    </div>
+                    <h2>Result from Decoding Text</h2>
+                    <ul data-bind="foreach: resultArr">
+                        <li>
+                            <p>
+                            <span data-bind="text: $data.text"></span> top:
+                            <span data-bind="text: $data.tb"></span> left:
+                            <span data-bind="text: $data.lr"></span>                      
+                        
+                        </p>
+                        </li>
+                    </ul>                
+                       
+                </div><!-- /content -->
+            
+                <div data-role="footer" data-position="fixed">
+                    <h4>Text</h4>
+                    <div data-role="navbar">
+                        <ul>
+                            <li><a href="#page1">Home</a></li>
+                            <li><a href="#page2">Camera</a></li>
+                            <li><a href="#page3">Result</a></li>
+                            <li><a href="#page4">Data</a></li>
+                        </ul>
+                    </div> 
+                </div><!-- /footer -->
+            </div><!-- /page -->
+
+            <div data-role="page"  data-theme="b" id="page4">
+                <div data-role="header" data-position="fixed">
+                    <h1>Edit</h1>
+                </div><!-- /header -->
+            
+                <div role="main" class="ui-content">
+
+                        <div data-role="collapsible-set" id="photoset">    
+                                <div id="photoip"data-role="collapsible" data-collapsed="true" data-theme="b" data-content-theme="a">
+                                        <h4 >fro photo Expense</h4>
+                                        <p>Shop :<input data-bind="textInput: editShop" /></p>
+                                        <p>Desc :<textarea data-bind="textInput: editDesc" ></textarea></p>
+                                        <div class="ui-grid-a">
+                                            <div class="ui-block-a date"> <p>When :
+                                                 <input class="form-control" type="text"  data-bind="textInput: editDate" data-role="datebox"  data-datebox-mode="calbox" id="db2" readonly>
+                                            </p></div>
+                                            <div class="ui-block-b"><p>Total :
+                                                <input type="number" data-bind="textInput: editTotal" />
+                                            </p></div>
+                                        
+                                        </div>
+                                       
+                                        <hr/>
+                                        <button data-bind="click: addExpense">Add</button>
+                                </div>
+                            </div>
+                                    
+                        
+                </div><!-- /content -->
+            
+                <div data-role="footer" data-position="fixed">                
+                    <div data-role="navbar">
+                        <ul>
+                            <li><a href="#page1">Home</a></li>
+                            <li><a href="#page2">Camera</a></li>
+                            <li><a href="#page3">Result</a></li>
+                        </ul>
+                    </div> 
+                </div><!-- /footer -->
+            </div><!-- /page -->
+
+
+
+
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/external/knockout-min.js"></script>
         <script type="text/javascript" src="js/external/pouchdb-7.0.0.min.js"></script>

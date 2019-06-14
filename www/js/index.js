@@ -297,32 +297,38 @@ function readPhotograph(){
                  tempLine.push(line)                
              }
          }
-         //myViewModel.resultArr(tempLine)
 
+        //myViewModel.editShop(tempLine[0].text)
+
+        findDate(tempLine);
         
-        // myViewModel.resultMsg(data.textBlocks);        
-        //tempLine = sortArray(data.textBlocks);
         tempLine = sortArray(tempLine);
-        //tempLine = findLargest(tempLine)
         myViewModel.editShop(tempLine[0].text)
-        console.log(tempLine)
-        addToLineArray(tempLine)     
-        
+        //tempLine = findLargest(tempLine)
         myViewModel.resultArr(tempLine)
 
-        // let descArr = myViewModel.editExpenses();
-        // let desc = descArr.join();
+        
+        
+        let displayList = groupByLine(tempLine)
+        console.log(displayList);
+        console.log("-------------------------")
 
+        console.log(Object.values(displayList))
 
-        // // let desc = myViewModel.editExpenses().map(function(o){
-        // //     return o['text'];
-        // // })
+        var  stdisplay = ''
 
-        // // console.log(desc)
-        // myViewModel.editDesc(desc)
+              
+        for (var itd in displayList){
+             displayList[itd].forEach(function (e){
+                 stdisplay += e.text+" ";
+             })
+             stdisplay += "\n";
+         }
 
+         myViewModel.editDesc(stdisplay);
+               
 
-     },
+        },
      
      function onFail(err) {
          console.log(err)
@@ -331,12 +337,49 @@ function readPhotograph(){
 
 function sortArray(myA){
 
-    myA.map(o => { o.tb = Math.round((o.boundingBox.top + o.boundingBox.bottom)/200); return o}); 
+    myA.map(o => { o.tb = Math.floor((o.boundingBox.top + o.boundingBox.bottom)/200); return o}); 
     //myA.map(o => { o.s = Math.round((o.boundingBox.bottom - o.boundingBox.top)); return o});
     myA.map(o => { o.lr = o.boundingBox.left; return o});
 
-    myA.sort(dynamicSort("tb")); 
+    myA.sort(function(a,b){
+        return a['tb'] - b['tb'] || a['lr'] - b['lr'];
+    })
+
+    //myA.sort(dynamicSort("tb"));
+    //groupByLine(myA) 
     return myA;
+}
+
+function groupByLine(myA){
+
+    let verticalArr = myA.reduce((r, a) => {      
+        r[a.tb] = [...r[a.tb] || [], a];
+        return r;
+    }, {});
+
+    return verticalArr;
+
+ 
+    // const groupBy = key => array =>
+    //     array.reduce((objectsByKeyValue, obj) => {
+    //     const value = obj[key];
+    //     objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+    //     return objectsByKeyValue;
+    // }, {});
+
+    //     console.log(">>>>>>>>>>>>>>---------<<<<<<<<<<<<<<");
+
+    // const groupByVertical = groupBy('tb')
+
+    // console.log(
+    //     JSON.stringify({
+    //         top: groupByVertical(myA)
+    //     },null,2)
+    // )
+
+
+
+
 }
 
 function addToLineArray(myA){
@@ -354,6 +397,7 @@ function addToLineArray(myA){
    //myViewModel.editExpenses(myA)
    
     console.log(ar1)
+   
 
     // ar1.map(function(o){
     //     return o['text']
@@ -362,6 +406,11 @@ function addToLineArray(myA){
     myViewModel.editDesc(ar1.join("\n"));  
     
     
+}
+
+function findDate(myA){
+
+
 }
 function findLargest(myA){
 

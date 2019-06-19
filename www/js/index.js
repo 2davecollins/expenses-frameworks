@@ -17,11 +17,7 @@ class Expense {
            
 }
 
-class MyArray extends Array {
-    sortBy(...args) {
-        return this.sort(dynamicSortMultiple.apply(null, args));
-    }
-}
+
 var db;
 var remoteCouch;
 
@@ -288,8 +284,7 @@ function readPhotograph(){
     let tempLine = [];
     let tempElement = []
  
-    MlKitPlugin.getText(img,{},function onSuccess(data) {
-           
+    MlKitPlugin.getText(img,{},function onSuccess(data) {    
          
 
          for (var block of data.textBlocks){
@@ -297,11 +292,9 @@ function readPhotograph(){
                  tempLine.push(line)                
              }
          }
-
         //myViewModel.editShop(tempLine[0].text)
-
         findDate(tempLine);
-        
+
         tempLine = sortArray(tempLine);
         myViewModel.editShop(tempLine[0].text)
         //tempLine = findLargest(tempLine)
@@ -314,9 +307,7 @@ function readPhotograph(){
         console.log("-------------------------")
 
         console.log(Object.values(displayList))
-
         var  stdisplay = ''
-
               
         for (var itd in displayList){
              displayList[itd].forEach(function (e){
@@ -324,9 +315,7 @@ function readPhotograph(){
              })
              stdisplay += "\n";
          }
-
-         myViewModel.editDesc(stdisplay);
-               
+         myViewModel.editDesc(stdisplay);              
 
         },
      
@@ -344,9 +333,6 @@ function sortArray(myA){
     myA.sort(function(a,b){
         return a['tb'] - b['tb'] || a['lr'] - b['lr'];
     })
-
-    //myA.sort(dynamicSort("tb"));
-    //groupByLine(myA) 
     return myA;
 }
 
@@ -358,57 +344,39 @@ function groupByLine(myA){
     }, {});
 
     return verticalArr;
-
  
-    // const groupBy = key => array =>
-    //     array.reduce((objectsByKeyValue, obj) => {
-    //     const value = obj[key];
-    //     objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
-    //     return objectsByKeyValue;
-    // }, {});
-
-    //     console.log(">>>>>>>>>>>>>>---------<<<<<<<<<<<<<<");
-
-    // const groupByVertical = groupBy('tb')
-
-    // console.log(
-    //     JSON.stringify({
-    //         top: groupByVertical(myA)
-    //     },null,2)
-    // )
-
-
-
-
 }
 
-function addToLineArray(myA){
-    let ar1=[]
-    let size = myA.length;
+// function addToLineArray(myA){
+//     let ar1=[]
+//     let size = myA.length;
 
-    myA.map(function (value,index, element){
-        if(index < size-1){
-            var next = element[index+1]
-            if(next.tb == element[index].tb){
-                ar1.push(element[index].text + " :"+next.text)
-            }
-        }
-    })
-   //myViewModel.editExpenses(myA)
+//     myA.map(function (value,index, element){
+//         if(index < size-1){
+//             var next = element[index+1]
+//             if(next.tb == element[index].tb){
+//                 ar1.push(element[index].text + " :"+next.text)
+//             }
+//         }
+//     })
+//    //myViewModel.editExpenses(myA)
    
-    console.log(ar1)
+//     console.log(ar1)
    
 
-    // ar1.map(function(o){
-    //     return o['text']
-    // })
+//     // ar1.map(function(o){
+//     //     return o['text']
+//     // })
 
-    myViewModel.editDesc(ar1.join("\n"));  
+//     myViewModel.editDesc(ar1.join("\n"));  
     
     
-}
+// }
 
-function findDate(myA){
+function findDate(myArr){
+
+    console.log(myArr);
+    const res = str.match(/\d{2}([\/.-])\d{2}\1\d{4}/g);
 
 
 }
@@ -424,39 +392,7 @@ function findLargest(myA){
     })
     return obj;
 }
-function dynamicSortMultiple() {
-    /*
-     * save the arguments object as it will be overwritten
-     * note that arguments object is an array-like object
-     * consisting of the names of the properties to sort by
-     */
-    var props = arguments;
-    return function (obj1, obj2) {
-        var i = 0, result = 0, numberOfProperties = props.length;
-        /* try getting a different result from 0 (equal)
-         * as long as we have extra properties to compare
-         */
-        while(result === 0 && i < numberOfProperties) {
-            result = dynamicSort(props[i])(obj1, obj2);
-            i++;
-        }
-        return result;
-    }
-}
-function dynamicSort(property) {
-    var sortOrder = 1;
-    if(property[0] === "-") {
-        sortOrder = -1;
-        property = property.substr(1);
-    }
-    return function (a,b) {
-        /* next line works with strings and numbers, 
-         * and you may want to customize it to your needs
-         */
-        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-        return result * sortOrder;
-    }
-}
+
 
 function setUpExpense (){
     myViewModel.expenses([]);

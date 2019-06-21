@@ -376,9 +376,14 @@ function groupByLine(myA){
 function findDate(myArr){
 
     console.log(myArr);
-    const res = str.match(/\d{2}([\/.-])\d{2}\1\d{4}/g);
+    //const res = str.match(/\d{2}([\/.-])\d{2}\1\d{4}/g);
 
 
+}
+
+function parseDate(str) {
+  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  return (m) ? new Date(m[3], m[2]-1, m[1]) : null;
 }
 function findLargest(myA){
 

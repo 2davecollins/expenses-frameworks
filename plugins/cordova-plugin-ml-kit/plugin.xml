@@ -25,6 +25,7 @@
         <framework src="com.google.firebase:firebase-ml-vision:+" />
 
         <source-file src="src/android/de/paulstelzer/MlKitPlugin.java" target-dir="src/de/paulstelzer" />
+        <source-file src="src/google-services.json" target-dir="src/" />
     </platform>
 
     <!-- ios -->

@@ -375,7 +375,31 @@ function groupByLine(myA){
 
 function findDate(myArr){
 
-    console.log(myArr);
+   //console.log(myArr);
+   const regexp = /(1[0-2]|0?[1-9])\/(3[01]|[12][0-9]|0?[1-9])\/(?:[0-9]{2})?[0-9]{2}$/ig;
+   const r1 = /\d{2}[\/]d{2}[\/]d{2}/g;
+   const r2 = /\d{2}\D\d{2}\D\d{2}/g;
+   const r3 = /\d{4}\D\d{2}\D\d{2}/g;
+   const r4 = /\d{2}\D\[^0-9]\D\d{2}/g;
+   const r5 = /\d{2}\[-\/\.]\d{2}\[-\/\.]\d{2}/g; 
+   
+   const r6 = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]|(?:Jan|Mar|May|Jul|Aug|Oct|Dec)))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2]|(?:Jan|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)(?:0?2|(?:Feb))\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9]|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep))|(?:1[0-2]|(?:Oct|Nov|Dec)))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g;
+
+
+   myArr.forEach( function(str){
+       if(r6.test(str.text)){
+            console.log("r6 "+str.text.match(r6))
+       }
+
+      
+       
+        
+
+        
+   
+    
+     
+   })
     //const res = str.match(/\d{2}([\/.-])\d{2}\1\d{4}/g);
 
 

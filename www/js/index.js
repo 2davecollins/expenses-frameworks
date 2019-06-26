@@ -283,40 +283,36 @@ function readPhotograph(){
     const img = myViewModel.imagePath();
     let tempLine = [];
     let tempElement = []
+    let dateArr = []
  
     MlKitPlugin.getText(img,{},function onSuccess(data) {    
          
-
-         for (var block of data.textBlocks){
+        const r = data.text;
+        dateArr = findDate(r)
+        console.log(dateArr)
+        
+        for (var block of data.textBlocks){
              for (var line of block.lines){
                  tempLine.push(line)                
              }
-         }
-        //myViewModel.editShop(tempLine[0].text)
-        findDate(tempLine);
-
+        }
+         
         tempLine = sortArray(tempLine);
         myViewModel.editShop(tempLine[0].text)
-        //tempLine = findLargest(tempLine)
+        myViewModel.editDate(dateArr[0]);     
         myViewModel.resultArr(tempLine)
 
         
         
-        let displayList = groupByLine(tempLine)
-        console.log(displayList);
-        console.log("-------------------------")
-
-        console.log(Object.values(displayList))
-        var  stdisplay = ''
-              
+        let displayList = groupByLine(tempLine)       
+        var  stdisplay = ''              
         for (var itd in displayList){
              displayList[itd].forEach(function (e){
                  stdisplay += e.text+" ";
-             })
-             stdisplay += "\n";
-         }
-         myViewModel.editDesc(stdisplay);              
-
+                })
+                stdisplay += "\n";
+            }
+            myViewModel.editDesc(stdisplay);
         },
      
      function onFail(err) {
@@ -325,11 +321,8 @@ function readPhotograph(){
 }
 
 function sortArray(myA){
-
     myA.map(o => { o.tb = Math.floor((o.boundingBox.top + o.boundingBox.bottom)/200); return o}); 
-    //myA.map(o => { o.s = Math.round((o.boundingBox.bottom - o.boundingBox.top)); return o});
     myA.map(o => { o.lr = o.boundingBox.left; return o});
-
     myA.sort(function(a,b){
         return a['tb'] - b['tb'] || a['lr'] - b['lr'];
     })
@@ -337,78 +330,27 @@ function sortArray(myA){
 }
 
 function groupByLine(myA){
-
     let verticalArr = myA.reduce((r, a) => {      
         r[a.tb] = [...r[a.tb] || [], a];
         return r;
     }, {});
-
-    return verticalArr;
- 
+    return verticalArr; 
 }
 
-// function addToLineArray(myA){
-//     let ar1=[]
-//     let size = myA.length;
+function findDate(str){
 
-//     myA.map(function (value,index, element){
-//         if(index < size-1){
-//             var next = element[index+1]
-//             if(next.tb == element[index].tb){
-//                 ar1.push(element[index].text + " :"+next.text)
-//             }
-//         }
-//     })
-//    //myViewModel.editExpenses(myA)
-   
-//     console.log(ar1)
-   
-
-//     // ar1.map(function(o){
-//     //     return o['text']
-//     // })
-
-//     myViewModel.editDesc(ar1.join("\n"));  
-    
-    
-// }
-
-function findDate(myArr){
-
-   //console.log(myArr);
-   const regexp = /(1[0-2]|0?[1-9])\/(3[01]|[12][0-9]|0?[1-9])\/(?:[0-9]{2})?[0-9]{2}$/ig;
-   const r1 = /\d{2}[\/]d{2}[\/]d{2}/g;
-   const r2 = /\d{2}\D\d{2}\D\d{2}/g;
-   const r3 = /\d{4}\D\d{2}\D\d{2}/g;
-   const r4 = /\d{2}\D\[^0-9]\D\d{2}/g;
-   const r5 = /\d{2}\[-\/\.]\d{2}\[-\/\.]\d{2}/g; 
-   
-   const r6 = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]|(?:Jan|Mar|May|Jul|Aug|Oct|Dec)))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2]|(?:Jan|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)(?:0?2|(?:Feb))\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9]|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep))|(?:1[0-2]|(?:Oct|Nov|Dec)))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/g;
-
-
-   myArr.forEach( function(str){
-       if(r6.test(str.text)){
-            console.log("r6 "+str.text.match(r6))
-       }
-
-      
-       
-        
-
-        
-   
-    
-     
-   })
-    //const res = str.match(/\d{2}([\/.-])\d{2}\1\d{4}/g);
-
-
+        let regeditNumbers = /\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/ig;
+        let regeditMonths = /(\b\d{1,2}\D{0,3})?(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(Nov|Dec)(?:ember)?)\D?(\d{1,2}\D?)?\D?((19[7-9]\d|20\d{2})|\d{2})/ig
+        let res1 = []
+        let res2 = []
+        if (regeditNumbers.test(str)){
+            res1 = str.match(regeditNumbers)
+        }if(regeditMonths.test(str)){
+           res2 =str.match(regeditMonths)
+        }
+        return res1.concat(res2)       
 }
 
-function parseDate(str) {
-  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  return (m) ? new Date(m[3], m[2]-1, m[1]) : null;
-}
 function findLargest(myA){
 
     // not so simple largest textBlock not the largest lettering could cover multiple lines
@@ -424,32 +366,13 @@ function findLargest(myA){
 
 
 function setUpExpense (){
-    myViewModel.expenses([]);
-    // myViewModel.expenses.push({
-    //     id:0,
-    //     shop:"Dunnes",
-    //     whenPurchased:"10-06-2019",
-    //     desc:"food",
-    //     total: 2.99
-    // });
-    // myViewModel.expenses.push({
-    //     id:1,
-    //     shop:"Aldi",
-    //     whenPurchased:"10-06-2019",
-    //     desc:"Bread",
-    //     total: 1.99
-    // });
-    // $( "#expenseset" ).collapsibleset( "refresh" );
-    
-
+    myViewModel.expenses([]);    
 };
-function editDisplay(expense){
-    
+function editDisplay(expense){    
     myViewModel.shopid(expense.shop),
     myViewModel.descip(expense.desc),
     myViewModel.whenPurchasedip(expense.whenPurchased),
     myViewModel.totalip(expense.total)
-
 
 };
 
@@ -517,6 +440,3 @@ function generateUUID() { // Public Domain/MIT
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
 }
-
-
-

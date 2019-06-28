@@ -379,7 +379,7 @@ function findDate(str){
 }
 function findTotal(str){
 
-    let regeditTotal = /Total?|(Bal(?:ance)?\b\d{1,}[.]\d{2} )/ig;
+    let regeditTotal = /Total?|(Bal(?:ance)?|Cash?\b\d{1,}[.]\d{2} )/ig;
 
     return str.match(regeditTotal);
 
@@ -391,7 +391,7 @@ function checkContainsPrice(str){
 }
 
 function checkContainsTotal(str){
-    let regeditTotal = /Total?|(Bal(?:ance)?)/ig;
+    let regeditTotal = /Total?|Bal(?:ance)?|Cash?/ig;
     return regeditTotal.test(str);
 }
 

@@ -284,12 +284,21 @@ function readPhotograph(){
     let tempLine = [];
     let tempElement = []
     let dateArr = []
+    let totalArr = []
+    let priceArr = []
  
-    MlKitPlugin.getText(img,{},function onSuccess(data) {    
+    MlKitPlugin.getText(img,{},function onSuccess(data) { 
+        
+        //adding comment
          
         const r = data.text;
         dateArr = findDate(r)
         console.log(dateArr)
+        totalArr = findTotal(r);
+        console.log(totalArr);
+        console.log(checkContainsTotal(r));
+        priceArr = checkContainsPrice(r);
+        console.log(priceArr);
         
         for (var block of data.textBlocks){
              for (var line of block.lines){
@@ -305,14 +314,32 @@ function readPhotograph(){
         
         
         let displayList = groupByLine(tempLine)       
-        var  stdisplay = ''              
+        let stdisplay = '';
+        let totalP = '';
+        let strDisolayFiltered = '';            
         for (var itd in displayList){
-             displayList[itd].forEach(function (e){
-                 stdisplay += e.text+" ";
-                })
-                stdisplay += "\n";
-            }
-            myViewModel.editDesc(stdisplay);
+             displayList[itd].forEach(function (e){               
+                    stdisplay += e.text+" ";                              
+            })
+            stdisplay += "\n";
+        }
+
+        // filter the display and show only items that contain price
+
+        let strArr = stdisplay.split("\n")
+        strArr.forEach( function(item, index){
+            if(checkContainsPrice(item)){
+                strDisolayFiltered += item;
+                console.log(item);    
+                strDisolayFiltered += "\n";
+                if(checkContainsTotal(item)){
+                    totalP = item;
+                }             
+            }           
+        })
+        myViewModel.editTotal(getPriceFromTotal(totalP));
+        myViewModel.editDesc(strDisolayFiltered);
+
         },
      
      function onFail(err) {
@@ -350,7 +377,28 @@ function findDate(str){
         }
         return res1.concat(res2)       
 }
+function findTotal(str){
 
+    let regeditTotal = /Total?|(Bal(?:ance)?\b\d{1,}[.]\d{2} )/ig;
+
+    return str.match(regeditTotal);
+
+}
+
+function checkContainsPrice(str){
+    const regeditPrice = /\d{1,}[.]\d{2}\b/i;
+    return regeditPrice.test(str);
+}
+
+function checkContainsTotal(str){
+    let regeditTotal = /Total?|(Bal(?:ance)?)/ig;
+    return regeditTotal.test(str);
+}
+
+function getPriceFromTotal(str){
+    const regeditPrice = /\d{1,}[.]\d{2}/i;
+    return str.match(regeditPrice);
+}
 function findLargest(myA){
 
     // not so simple largest textBlock not the largest lettering could cover multiple lines
@@ -404,9 +452,6 @@ function addNewExpense (){
 function refreshList (){
     setTimeout(function(){
        
-               
-        //$( "#inputset" ).children().collapsible("collapse");
-      //  $( "#expenseset" ).children().collapsible("collapse");
         $( "#expenseset" ).collapsibleset( "refresh" );
 
     },5);

@@ -13,7 +13,7 @@ class Expense {
     }
     get expenseUpLoaded (){
         return this.uploaded;
-    }  
+    }
            
 }
 
@@ -57,9 +57,7 @@ var app = {
 
 app.initialize();
 
-
-var myViewModel = {
-    
+var myViewModel = {    
     personName: ko.observable('Dave'),
     idip:ko.observable(0),
     shopid:ko.observable(''),
@@ -289,8 +287,7 @@ function readPhotograph(){
  
     MlKitPlugin.getText(img,{},function onSuccess(data) { 
         
-        //adding comment
-         
+                 
         const r = data.text;
         dateArr = findDate(r)
         console.log(dateArr)
@@ -299,16 +296,28 @@ function readPhotograph(){
         console.log(checkContainsTotal(r));
         priceArr = checkContainsPrice(r);
         console.log(priceArr);
+
+        //Create an array of text objects in eacl line of returned data
         
         for (var block of data.textBlocks){
              for (var line of block.lines){
                  tempLine.push(line)                
              }
         }
-         
+        // array is returned in no set order
+        // sort array depending on center of bounding box top to bottom
+        // sort array from left to right 
         tempLine = sortArray(tempLine);
+        // TODO confirm or check if another way to do this
+        // assumption the first element in the array is text represending the shop
+        // where receipt is from
         myViewModel.editShop(tempLine[0].text)
-        myViewModel.editDate(dateArr[0]);     
+        // dateArray contains array of regular expressions for date found in text
+        // maybe set todays date if null or no date found 
+        myViewModel.editDate(dateArr[0]);
+
+        // used to show the returned recognised text
+
         myViewModel.resultArr(tempLine)
 
         
@@ -342,12 +351,15 @@ function readPhotograph(){
 
         },
      
-     function onFail(err) {
+    function onFail(err) {
          console.log(err)
-     });    
+    });    
 }
 
 function sortArray(myA){
+    // add to object tb top bottom average set to flor
+    // add to object lr the left side of bounding box
+    // sort array from top to bottom left to right
     myA.map(o => { o.tb = Math.floor((o.boundingBox.top + o.boundingBox.bottom)/200); return o}); 
     myA.map(o => { o.lr = o.boundingBox.left; return o});
     myA.sort(function(a,b){
@@ -357,6 +369,7 @@ function sortArray(myA){
 }
 
 function groupByLine(myA){
+    // group array to combine elements on the same line
     let verticalArr = myA.reduce((r, a) => {      
         r[a.tb] = [...r[a.tb] || [], a];
         return r;
@@ -364,7 +377,14 @@ function groupByLine(myA){
     return verticalArr; 
 }
 
+//Regular Expressions
+
 function findDate(str){
+        // Regular expression to find date strings in form
+        // dd/mm/yyyy
+        // dd/jan/yyyy
+        // return an array of all dates found
+        // TODO consider format of mm/dd/yy
 
         let regeditNumbers = /\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/ig;
         let regeditMonths = /(\b\d{1,2}\D{0,3})?(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|(Nov|Dec)(?:ember)?)\D?(\d{1,2}\D?)?\D?((19[7-9]\d|20\d{2})|\d{2})/ig
@@ -377,7 +397,11 @@ function findDate(str){
         }
         return res1.concat(res2)       
 }
+
+
 function findTotal(str){
+
+    // Regular expression to find total may not be needed use checkContainsTotal
 
     let regeditTotal = /Total?|(Bal(?:ance)?|Cash?\b\d{1,}[.]\d{2} )/ig;
 
@@ -386,23 +410,30 @@ function findTotal(str){
 }
 
 function checkContainsPrice(str){
+    // Regular expression  find if it contains a price xxx.xx space
     const regeditPrice = /\d{1,}[.]\d{2}\b/i;
     return regeditPrice.test(str);
 }
 
 function checkContainsTotal(str){
+    //Regular expression to find if text contains dictionary
+    //Total Bal Cash TODO may be more required
     let regeditTotal = /Total?|Bal(?:ance)?|Cash?/ig;
     return regeditTotal.test(str);
 }
 
 function getPriceFromTotal(str){
+    // if line contains Total Bal Cash return the decmial value
     const regeditPrice = /\d{1,}[.]\d{2}/i;
     return str.match(regeditPrice);
 }
+
+
+
 function findLargest(myA){
 
     // not so simple largest textBlock not the largest lettering could cover multiple lines
-
+    // may be needed if cant use first exement of array as shop
     const res = Math.max.apply(Math, myA.map(function (o) {
         return o.s;
     }))
@@ -474,7 +505,8 @@ function removeSomeExpense(el){
     myViewModel.expenses(newArr);
 }
 
-function generateUUID() { // Public Domain/MIT
+function generateUUID() { 
+    // Generate a UUID for database
     var d = new Date().getTime();
     if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
         d += performance.now(); //use high-precision timer if available
